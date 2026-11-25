@@ -18,6 +18,8 @@ htmlcov/
 *.sqlite
 *.sqlite3
 *_report.pdf
+!docs/ASSIGNMENT_REPORT.pdf
+!docs/DEPLOYMENT_STRATEGIES.pdf
 
 # CI/CD generated reports
 reports/*.xml

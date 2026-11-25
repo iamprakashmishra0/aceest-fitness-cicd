@@ -30,6 +30,7 @@ services:
       - GITHUB_REPO_URL=${GITHUB_REPO_URL:-https://github.com/<user>/<repo>.git}
       - DOCKERHUB_USER=${DOCKERHUB_USER:-}
       - DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD:-}
+      - SONAR_TOKEN=${SONAR_TOKEN:-}
     restart: unless-stopped
 
 volumes:

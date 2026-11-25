@@ -34,6 +34,11 @@ credentials:
               username: "${DOCKERHUB_USER}"
               password: "${DOCKERHUB_PASSWORD}"
               description: "Docker Hub account used by the pipeline"
+          - string:
+              scope: GLOBAL
+              id: sonar-token
+              secret: "${SONAR_TOKEN}"
+              description: "SonarQube analysis token"
 
 unclassified:
   location:
