@@ -24,6 +24,17 @@ jenkins:
           - key: GITHUB_REPO_URL
             value: "${GITHUB_REPO_URL}"
 
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: dockerhub-credentials
+              username: "${DOCKERHUB_USER}"
+              password: "${DOCKERHUB_PASSWORD}"
+              description: "Docker Hub account used by the pipeline"
+
 unclassified:
   location:
     url: "http://localhost:8080/"
@@ -32,6 +43,13 @@ jobs:
   - script: |
       pipelineJob('aceest-fitness') {
         description('ACEest Fitness & Gym — pulls the latest code from GitHub and runs a clean BUILD, test and container smoke test (Phase 5).')
+        parameters {
+          choiceParam('DEPLOY_STRATEGY', ['rolling-update', 'blue-green', 'canary', 'shadow', 'ab-testing'], 'Progressive delivery strategy')
+          stringParam('APP_VERSION', '1.0.0', 'Semantic version from the Git tag')
+          booleanParam('PUSH_IMAGE', true, 'Push the release image to Docker Hub')
+          booleanParam('DEPLOY_TO_K8S', true, 'Deploy and smoke-test on the cluster')
+          booleanParam('RUN_SONAR', true, 'Run the SonarQube analysis and quality gate')
+        }
         // Poll GitHub for new commits every ~5 minutes (H = load balanced).
         triggers {
           scm('H/5 * * * *')

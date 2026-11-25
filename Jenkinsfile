@@ -8,6 +8,7 @@ pipeline {
         string(name: 'APP_VERSION', defaultValue: '1.0.0', description: 'Semantic version from the Git tag')
         booleanParam(name: 'PUSH_IMAGE', defaultValue: true, description: 'Push the release image to Docker Hub')
         booleanParam(name: 'DEPLOY_TO_K8S', defaultValue: true, description: 'Deploy and smoke-test on the cluster')
+        booleanParam(name: 'RUN_SONAR', defaultValue: true, description: 'Run the SonarQube analysis and quality gate')
     }
 
     triggers {
@@ -67,15 +68,17 @@ pipeline {
                 sh '''
                     set -eu
                     docker build --target test -t "${IMAGE_NAME}:test-${BUILD_NUMBER}" .
-                    docker run --rm -v "${WORKSPACE}/reports:/app/reports" \
-                        "${IMAGE_NAME}:test-${BUILD_NUMBER}" \
+                    cid=$(docker create "${IMAGE_NAME}:test-${BUILD_NUMBER}" \
                         python -m pytest \
                             --junitxml=reports/junit.xml \
                             --cov=aceest \
                             --cov-report=term-missing \
                             --cov-report=xml:reports/coverage.xml \
-                            --cov-fail-under=90
-                    python scripts/normalize-coverage.py reports/coverage.xml
+                            --cov-fail-under=90)
+                    docker start -a "${cid}"
+                    docker cp "${cid}:/app/reports/." reports/
+                    docker rm "${cid}" >/dev/null
+                    python3 scripts/normalize-coverage.py reports/coverage.xml
                 '''
             }
             post {
@@ -86,16 +89,41 @@ pipeline {
         }
 
         stage('SonarQube Quality Gate') {
+            when {
+                expression { return params.RUN_SONAR }
+            }
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withCredentials([string(
+                    credentialsId: 'sonar-token',
+                    variable: 'SONAR_TOKEN'
+                )]) {
                     sh '''
-                        sonar-scanner \
+                        set -eu
+                        docker run --rm --network host \
+                            -v "${WORKSPACE}:/usr/src" -w /usr/src \
+                            -e SONAR_HOST_URL=http://localhost:9000 \
+                            -e SONAR_TOKEN \
+                            sonarsource/sonar-scanner-cli \
                             -Dsonar.projectVersion="${APP_VERSION}" \
                             -Dsonar.python.coverage.reportPaths=reports/coverage.xml
+
+                        for i in $(seq 1 60); do
+                            status=$(curl -fsS -u "${SONAR_TOKEN}:" \
+                                "http://localhost:9000/api/qualitygates/project_status?projectKey=aceest-fitness-cicd" \
+                                | python3 -c 'import json,sys; print(json.load(sys.stdin)["projectStatus"]["status"])')
+                            if [ "${status}" = "OK" ]; then
+                                echo "Quality gate: PASS"
+                                exit 0
+                            fi
+                            if [ "${status}" = "ERROR" ]; then
+                                echo "Quality gate: FAILED"
+                                exit 1
+                            fi
+                            sleep 3
+                        done
+                        echo "Timed out waiting for quality gate"
+                        exit 1
                     '''
-                }
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
                 }
             }
         }

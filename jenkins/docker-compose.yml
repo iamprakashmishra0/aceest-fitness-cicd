@@ -28,6 +28,8 @@ services:
       - CASC_JENKINS_CONFIG=/casc/jenkins.yaml
       - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD:-change-me}
       - GITHUB_REPO_URL=${GITHUB_REPO_URL:-https://github.com/<user>/<repo>.git}
+      - DOCKERHUB_USER=${DOCKERHUB_USER:-}
+      - DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD:-}
     restart: unless-stopped
 
 volumes:
