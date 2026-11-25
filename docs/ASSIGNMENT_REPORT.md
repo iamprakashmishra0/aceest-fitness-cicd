@@ -113,7 +113,7 @@ the public GitHub URL and the live cluster endpoint must be filled in after
 running the pipeline in the student's own environment:
 
 - GitHub repository: https://github.com/iamprakashmishra0/aceest-fitness-cicd
-- Jenkins successful build: `<add job URL and build number>`
+- Jenkins successful build: http://localhost:8080/job/aceest-fitness/3/ (build #3, SUCCESS)
 - SonarQube project: http://localhost:9000/dashboard?id=aceest-fitness-cicd — quality gate **PASS (OK)**, coverage 93.2%, 0 bugs, 0 vulnerabilities
 - Docker Hub repository: https://hub.docker.com/r/iamprakashmishra/aceest-fitness (tags `3.2.4` and `latest`)
 - Cluster endpoint: http://192.168.49.2:31492 (Minikube NodePort; requires `minikube start`)
