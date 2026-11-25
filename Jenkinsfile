@@ -132,6 +132,7 @@ pipeline {
             steps {
                 sh '''
                     set -eu
+                    export GIT_SHA="${GIT_SHA:-unknown}"
                     docker build \
                         --build-arg APP_VERSION="${APP_VERSION}" \
                         --build-arg DEPLOY_STRATEGY="${DEPLOY_STRATEGY}" \
