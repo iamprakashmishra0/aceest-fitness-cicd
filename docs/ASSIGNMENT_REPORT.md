@@ -237,5 +237,3 @@ stored in `docs/evidence/` for auditability.
 | Deployment runbook as PDF | `docs/DEPLOYMENT_STRATEGIES.pdf` |
 
 The localhost links require Jenkins, SonarQube and Minikube to be running.
-PDF versions are generated from the Markdown sources with WeasyPrint so the
-submission contains both editable and read-only copies.
