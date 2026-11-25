@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: aceest-mirror
+  namespace: aceest
+spec:
+  hosts:
+    - aceest.aceest.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: aceest.aceest.svc.cluster.local
+            subset: stable
+      mirror:
+        host: aceest.aceest.svc.cluster.local
+        subset: shadow
+      mirrorPercentage:
+        value: 100

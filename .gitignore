@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Test & coverage artefacts
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Databases & generated artifacts
+*.db
+*.sqlite
+*.sqlite3
+*_report.pdf
+
+# CI/CD generated reports
+reports/*.xml
+reports/htmlcov/
+.jenkins-venv/
+.ci-venv/
+
+# Environment
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

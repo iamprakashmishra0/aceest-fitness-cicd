@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aceest
+  namespace: aceest
+spec:
+  type: ClusterIP
+  selector:
+    app: aceest
+    track: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

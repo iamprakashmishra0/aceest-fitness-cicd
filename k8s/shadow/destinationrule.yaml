@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: aceest
+  namespace: aceest
+spec:
+  host: aceest.aceest.svc.cluster.local
+  subsets:
+    - name: stable
+      labels:
+        track: stable
+    - name: shadow
+      labels:
+        track: shadow
